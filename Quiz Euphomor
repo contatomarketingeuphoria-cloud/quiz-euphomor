@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz & Certificado Euphomor 2026 - Editora Euphoria</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandPink: '#FF2A85',
+                        brandPinkHover: '#E02073',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- html2canvas Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Cinzel:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d0d11;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .font-cert {
+            font-family: 'Cinzel', serif;
+        }
+
+        /* Certificado Base Styles */
+        .certificate-box {
+            width: 800px;
+            height: 560px;
+            background-color: #ffffff;
+            color: #111111;
+            border: 8px solid #FF2A85;
+            box-shadow: 0 20px 50px rgba(255, 42, 133, 0.25);
+            position: relative;
+        }
+
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #111115; }
+        ::-webkit-scrollbar-thumb { background: #FF2A85; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #E02073; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- Header / Barra de Navegação -->
+    <header class="w-full bg-zinc-950 border-b border-zinc-800 py-4 px-6 flex items-center justify-between sticky top-0 z-30">
+        <div class="flex items-center gap-3">
+            <span class="w-3 h-3 rounded-full bg-brandPink animate-pulse"></span>
+            <h1 class="text-lg font-bold tracking-wider uppercase text-white">
+                Editora Euphoria <span class="text-brandPink text-xs font-normal">| Euphomor 2026</span>
+            </h1>
+        </div>
+
+        <div id="nav-actions">
+            <!-- Renderizado dinamicamente via JS -->
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 md:p-8 flex flex-col justify-center">
+
+        <!-- ==================== 1. MODO EDITOR ==================== -->
+        <section id="editor-mode" class="space-y-6">
+            <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-xl space-y-8">
+                
+                <!-- Cabeçalho do Editor -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-zinc-800">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-pen-to-square text-brandPink"></i> Painel de Edição
+                        </h2>
+                        <p class="text-xs text-zinc-400 mt-1">Configure o certificado e as 10 perguntas do Quiz para os seus leitores.</p>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                        <!-- Botão Destaque para Pré-visualizar -->
+                        <button onclick="openPreviewModal()" class="flex-1 sm:flex-none px-5 py-3 bg-zinc-800 hover:bg-zinc-700 text-brandPink font-bold text-xs uppercase tracking-wider rounded-xl border border-brandPink/40 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md">
+                            <i class="fa-solid fa-eye text-sm"></i> Pré-visualizar Certificado
+                        </button>
+
+                        <button onclick="publishQuiz()" class="flex-1 sm:flex-none px-6 py-3 bg-brandPink hover:bg-brandPinkHover text-white font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all shadow-lg shadow-pink-600/30 flex items-center justify-center gap-2 cursor-pointer">
+                            <i class="fa-solid fa-paper-plane text-sm"></i> Publicar Quiz
+                        </button>
+                    </div>
+                </div>
+
+                <!-- PAINEL 1: EDIÇÃO DO CERTIFICADO -->
+                <div class="bg-black/60 border border-brandPink/30 p-6 rounded-xl space-y-4">
+                    <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+                        <h3 class="text-lg font-bold text-brandPink flex items-center gap-2">
+                            <i class="fa-solid fa-certificate"></i> Configurações do Certificado
+                        </h3>
+                        <div class="flex items-center gap-3">
+                            <button onclick="resetCertConfigDefaults()" class="text-xs text-zinc-400 hover:text-brandPink transition-colors flex items-center gap-1">
+                                <i class="fa-solid fa-rotate-left"></i> Padrão
+                            </button>
+                            <button onclick="openPreviewModal()" class="text-xs font-bold text-brandPink hover:underline flex items-center gap-1">
+                                <i class="fa-solid fa-expand"></i> Ver Prévia
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-zinc-300 mb-1">Título do Certificado:</label>
+                            <input type="text" id="edit-cert-title" oninput="updateCertConfigFromInputs()" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brandPink">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-zinc-300 mb-1">Subtítulo / Ano:</label>
+                            <input type="text" id="edit-cert-subtitle" oninput="updateCertConfigFromInputs()" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brandPink">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-zinc-300 mb-1">Nome Padrão de Teste:</label>
+                            <input type="text" id="edit-cert-default-name" oninput="updateCertConfigFromInputs()" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brandPink">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-300 mb-1">Texto de Aprovação:</label>
+                        <textarea id="edit-cert-desc" rows="3" oninput="updateCertConfigFromInputs()" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brandPink leading-relaxed"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-zinc-300 mb-1">Validação Oficial (Rodapé Centro):</label>
+                            <input type="text" id="edit-cert-validation" oninput="updateCertConfigFromInputs()" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brandPink">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-zinc-300 mb-1">Rótulo Esquerda (Ex: Data):</label>
+                            <input type="text" id="edit-cert-left-label" oninput="updateCertConfigFromInputs()" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brandPink">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-zinc-300 mb-1">Rótulo Direita (Ex: Assinatura):</label>
+                            <input type="text" id="edit-cert-right-label" oninput="updateCertConfigFromInputs()" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brandPink">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PAINEL 2: EDIÇÃO DAS PERGUNTAS -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2 border-b border-zinc-800 pb-3">
+                        <i class="fa-solid fa-list-check text-brandPink"></i> Edição das 10 Perguntas do Quiz
+                    </h3>
+                    
+                    <div id="questions-editor-list" class="space-y-8">
+                        <!-- Popula dinamicamente via JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Rodapé de Ações do Editor -->
+                <div class="pt-6 border-t border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <button onclick="openPreviewModal()" class="w-full sm:w-auto px-6 py-3.5 bg-zinc-800 hover:bg-zinc-700 text-brandPink font-bold text-xs uppercase tracking-wider rounded-xl border border-brandPink/40 transition-all flex items-center justify-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-eye text-sm"></i> Pré-visualizar Certificado
+                    </button>
+
+                    <button onclick="publishQuiz()" class="w-full sm:w-auto px-8 py-3.5 bg-brandPink hover:bg-brandPinkHover text-white font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all shadow-xl shadow-pink-600/40 flex items-center justify-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-paper-plane text-sm"></i> Publicar Quiz e Certificado
+                    </button>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ==================== 2. MODO QUIZ / LEITOR ==================== -->
+        <section id="quiz-mode" class="space-y-6 hidden">
+            
+            <!-- Card Principal do Quiz -->
+            <div id="quiz-card" class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 sm:p-10 shadow-2xl space-y-8">
+                <!-- Status do Progresso -->
+                <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
+                    <span id="quiz-progress-text" class="text-xs font-bold text-brandPink uppercase tracking-wider">
+                        Pergunta 1 de 10
+                    </span>
+                    <span class="text-xs text-zinc-500 font-mono">Quiz Euphomor 2026</span>
+                </div>
+
+                <!-- Container da Pergunta -->
+                <div id="quiz-question-container" class="space-y-6">
+                    <!-- Conteúdo Dinâmico -->
+                </div>
+
+                <!-- Navegação -->
+                <div class="flex items-center justify-between pt-6 border-t border-zinc-800">
+                    <button id="btn-prev" onclick="prevQuestion()" class="px-5 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold text-xs uppercase tracking-wider rounded-xl transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+                        <i class="fa-solid fa-arrow-left mr-2"></i> Anterior
+                    </button>
+                    
+                    <button id="btn-next" onclick="nextQuestion()" class="px-6 py-3 bg-brandPink hover:bg-brandPinkHover text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-lg shadow-pink-600/30">
+                        Próxima <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card de Resultado & Certificado Final -->
+            <div id="results-card" class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 sm:p-10 shadow-2xl space-y-8 hidden">
+                
+                <div class="text-center space-y-3">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brandPink/10 text-brandPink text-2xl mb-2 border border-brandPink/30">
+                        <i class="fa-solid fa-award"></i>
+                    </div>
+                    <h2 class="text-3xl font-extrabold text-white">Parabéns, Euphomor!</h2>
+                    <p id="score-text" class="text-zinc-400 text-sm max-w-md mx-auto"></p>
+                </div>
+
+                <!-- Campo de Nome do Estudante -->
+                <div class="max-w-md mx-auto bg-black p-5 rounded-xl border border-zinc-800 space-y-3">
+                    <label for="cert-name-input" class="block text-xs font-bold text-brandPink uppercase tracking-wider">
+                        Nome para o Certificado:
+                    </label>
+                    <input type="text" id="cert-name-input" value="Sky Monteiro" oninput="updateCertName(this.value)" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:border-brandPink transition-colors">
+                </div>
+
+                <!-- ÁREA DO CERTIFICADO FINAL (Relação de Renderização) -->
+                <div class="w-full overflow-x-auto pb-4 pt-2 flex justify-center">
+                    <div id="final-certificate-element" class="certificate-box p-10 flex flex-col justify-between text-center shrink-0">
+                        <!-- Topo -->
+                        <div class="space-y-1">
+                            <h1 id="final-cert-title" class="font-cert text-3xl font-extrabold uppercase tracking-widest text-black">
+                                Certificado de Aprovação
+                            </h1>
+                            <div id="final-cert-subtitle" class="text-brandPink font-bold text-sm tracking-widest uppercase">
+                                Euphomor 2026
+                            </div>
+                            <div class="w-32 h-1 bg-brandPink mx-auto mt-2"></div>
+                        </div>
+
+                        <!-- Corpo -->
+                        <div class="space-y-4 my-auto py-4">
+                            <div class="text-xs uppercase tracking-widest text-zinc-500 font-semibold">
+                                Certificamos que
+                            </div>
+                            
+                            <div id="final-cert-name" class="font-cert text-3xl font-extrabold text-brandPink uppercase border-b-2 border-dashed border-black inline-block px-6 py-1 min-w-[280px]">
+                                SKY MONTEIRO
+                            </div>
+
+                            <p id="final-cert-desc" class="text-sm font-medium text-zinc-800 max-w-lg mx-auto leading-relaxed pt-2">
+                                Você foi aprovado como Euphomor de carteirinha no ano de 2026 com carga horária de muitos livros da sua cobrinha favorita. Nos vemos em 2027 para mais
+                            </p>
+                        </div>
+
+                        <!-- Rodapé Minimalista: Data (Esquerda), Assinatura (Direita) e Validação (Centro) -->
+                        <div class="flex items-end justify-between pt-6 border-t border-zinc-200 relative">
+                            <!-- Esquerda: Data -->
+                            <div class="w-44 text-center">
+                                <div id="final-cert-date" class="text-xs font-semibold text-zinc-800 pb-1">11/11/2026</div>
+                                <div class="border-t border-black mb-1"></div>
+                                <div id="final-cert-left-label" class="text-[10px] uppercase tracking-wider text-zinc-500 font-bold">Data de Emissão</div>
+                            </div>
+
+                            <!-- CENTRO EXATO: Validação Oficial da Editora -->
+                            <div class="absolute left-1/2 transform -translate-x-1/2 bottom-0 text-center w-60">
+                                <div class="text-[10px] uppercase tracking-widest text-zinc-400 font-bold mb-0.5">Validação Oficial</div>
+                                <div id="final-cert-validation" class="text-sm font-extrabold tracking-widest text-brandPink uppercase">EDITORA EUPHORIA</div>
+                            </div>
+
+                            <!-- Direita: Assinatura -->
+                            <div class="w-44 text-center">
+                                <div class="text-xs font-bold text-zinc-800 pb-1 font-cert">Editora Euphoria</div>
+                                <div class="border-t border-black mb-1"></div>
+                                <div id="final-cert-right-label" class="text-[10px] uppercase tracking-wider text-zinc-500 font-bold">Assinatura</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
+                    <button onclick="downloadPNG('final-certificate-element')" class="w-full sm:w-auto px-8 py-3.5 bg-brandPink hover:bg-brandPinkHover text-white font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all shadow-lg shadow-pink-600/30 flex items-center justify-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-download text-base"></i> Baixar Certificado em PNG
+                    </button>
+                    
+                    <button onclick="restartQuiz()" class="w-full sm:w-auto px-6 py-3.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold text-xs uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-rotate-right"></i> Refazer Quiz
+                    </button>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- Footer Geral -->
+    <footer class="w-full bg-zinc-950 border-t border-zinc-800 py-4 text-center text-xs text-zinc-500">
+        &copy; 2026 Editora Euphoria &bull; Plataforma Oficial Euphomor
+    </footer>
+
+
+    <!-- ==================== 3. MODAL DE PRÉ-VISUALIZAÇÃO DO CERTIFICADO ==================== -->
+    <div id="preview-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-4xl w-full max-h-[95vh] flex flex-col shadow-2xl overflow-hidden">
+            
+            <!-- Modal Header -->
+            <div class="p-4 px-6 border-b border-zinc-800 flex items-center justify-between bg-zinc-950">
+                <div class="flex items-center gap-2 text-brandPink font-bold text-sm">
+                    <i class="fa-solid fa-eye"></i> Pré-visualização do Certificado em Tempo Real
+                </div>
+                <button onclick="closePreviewModal()" class="text-zinc-400 hover:text-white text-lg p-1 transition-colors cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content / Body -->
+            <div class="p-6 overflow-auto flex-1 flex flex-col items-center justify-center bg-black/40">
+                
+                <div class="w-full overflow-x-auto pb-2 flex justify-center">
+                    <div id="modal-certificate-element" class="certificate-box p-10 flex flex-col justify-between text-center shrink-0">
+                        <!-- Topo -->
+                        <div class="space-y-1">
+                            <h1 id="modal-cert-title" class="font-cert text-3xl font-extrabold uppercase tracking-widest text-black">
+                                Certificado de Aprovação
+                            </h1>
+                            <div id="modal-cert-subtitle" class="text-brandPink font-bold text-sm tracking-widest uppercase">
+                                Euphomor 2026
+                            </div>
+                            <div class="w-32 h-1 bg-brandPink mx-auto mt-2"></div>
+                        </div>
+
+                        <!-- Corpo -->
+                        <div class="space-y-4 my-auto py-4">
+                            <div class="text-xs uppercase tracking-widest text-zinc-500 font-semibold">
+                                Certificamos que
+                            </div>
+                            
+                            <div id="modal-cert-name" class="font-cert text-3xl font-extrabold text-brandPink uppercase border-b-2 border-dashed border-black inline-block px-6 py-1 min-w-[280px]">
+                                SKY MONTEIRO
+                            </div>
+
+                            <p id="modal-cert-desc" class="text-sm font-medium text-zinc-800 max-w-lg mx-auto leading-relaxed pt-2">
+                                Você foi aprovado como Euphomor de carteirinha no ano de 2026 com carga horária de muitos livros da sua cobrinha favorita. Nos vemos em 2027 para mais
+                            </p>
+                        </div>
+
+                        <!-- Rodapé Minimalista -->
+                        <div class="flex items-end justify-between pt-6 border-t border-zinc-200 relative">
+                            <!-- Esquerda: Data -->
+                            <div class="w-44 text-center">
+                                <div id="modal-cert-date" class="text-xs font-semibold text-zinc-800 pb-1">11/11/2026</div>
+                                <div class="border-t border-black mb-1"></div>
+                                <div id="modal-cert-left-label" class="text-[10px] uppercase tracking-wider text-zinc-500 font-bold">Data de Emissão</div>
+                            </div>
+
+                            <!-- CENTRO EXATO: Validação Oficial -->
+                            <div class="absolute left-1/2 transform -translate-x-1/2 bottom-0 text-center w-60">
+                                <div class="text-[10px] uppercase tracking-widest text-zinc-400 font-bold mb-0.5">Validação Oficial</div>
+                                <div id="modal-cert-validation" class="text-sm font-extrabold tracking-widest text-brandPink uppercase">EDITORA EUPHORIA</div>
+                            </div>
+
+                            <!-- Direita: Assinatura -->
+                            <div class="w-44 text-center">
+                                <div class="text-xs font-bold text-zinc-800 pb-1 font-cert">Editora Euphoria</div>
+                                <div class="border-t border-black mb-1"></div>
+                                <div id="modal-cert-right-label" class="text-[10px] uppercase tracking-wider text-zinc-500 font-bold">Assinatura</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-4 px-6 border-t border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-3 bg-zinc-950">
+                <p class="text-xs text-zinc-400">Este é o modelo exato que o leitor receberá após responder ao quiz.</p>
+                <div class="flex items-center gap-3 w-full sm:w-auto">
+                    <button onclick="downloadPNG('modal-certificate-element')" class="w-full sm:w-auto px-5 py-2.5 bg-brandPink hover:bg-brandPinkHover text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-download"></i> Baixar Teste PNG
+                    </button>
+                    <button onclick="closePreviewModal()" class="w-full sm:w-auto px-5 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer">
+                        Fechar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Mensagens Notificações -->
+    <div id="custom-modal-container" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-zinc-900 border border-brandPink/40 p-6 rounded-2xl max-w-sm w-full text-center space-y-4 shadow-2xl">
+            <div class="w-12 h-12 bg-brandPink/10 text-brandPink rounded-full flex items-center justify-center mx-auto text-xl border border-brandPink/30">
+                <i class="fa-solid fa-circle-info"></i>
+            </div>
+            <h3 id="modal-title" class="text-lg font-bold text-white"></h3>
+            <p id="modal-message" class="text-sm text-zinc-300 leading-relaxed"></p>
+            <button onclick="closeModal()" class="w-full py-2.5 bg-brandPink hover:bg-brandPinkHover text-white font-bold rounded-xl text-sm transition-colors cursor-pointer shadow-lg">
+                Ok
+            </button>
+        </div>
+    </div>
+
+
+    <!-- LÓGICA JAVASCRIPT DA APLICAÇÃO -->
+    <script>
+        // Perguntas Padrão do Quiz (10 Perguntas)
+        const DEFAULT_QUESTIONS = [
+            {
+                question: "1. Qual é o gênero principal das publicações da Editora Euphoria?",
+                options: ["Romance Dark & Fantasia", "Livros Didáticos", "Biografias Acadêmicas", "Manuais Técnicos"],
+                correct: 0
+            },
+            {
+                question: "2. Como são carinhosamente chamados os leitores fiéis da Editora Euphoria?",
+                options: ["Euphoriados", "Euphomors", "Leitores de Ouro", "Cobrinhas VIP"],
+                correct: 1
+            },
+            {
+                question: "3. Qual é o mascote e símbolo de afeto da comunidade de leitores?",
+                options: ["Uma Cobrinha", "Um Dragão", "Um Corvo", "Um Gato Preto"],
+                correct: 0
+            },
+            {
+                question: "4. Qual o tom de destaque da identidade visual da Editora Euphoria?",
+                options: ["Azul Marinho", "Verde Esmeralda", "Rosa Vibrante (#FF2A85)", "Amarelo Neon"],
+                correct: 2
+            },
+            {
+                question: "5. Em que ano a certificação de leitura Euphomor de carteirinha é concedida nesta edição?",
+                options: ["2024", "2025", "2026", "2027"],
+                correct: 2
+            },
+            {
+                question: "6. O que acontece ao responder corretamente às perguntas do Quiz Euphomor?",
+                options: ["Ganha um prêmio físico", "Recebe o Certificado Oficial de Aprovação", "Ganha um cupom de 90%", "Nada acontece"],
+                correct: 1
+            },
+            {
+                question: "7. Quando a comunidade Euphomor se reunirá novamente para mais novidades?",
+                options: ["Ainda este mês", "Em 2027", "Em 2030", "Nunca mais"],
+                correct: 1
+            },
+            {
+                question: "8. Qual elemento NÃO deve estar presente no certificado minimalista oficial?",
+                options: ["Nome do Leitor", "Validação Oficial", "Selos gráficos e brasões decorativos", "Texto de Aprovação"],
+                correct: 2
+            },
+            {
+                question: "9. Quem assina a validação oficial no rodapé do certificado?",
+                options: ["Editora Euphoria", "Clube do Livro", "Livraria Central", "Comunidade Aberta"],
+                correct: 0
+            },
+            {
+                question: "10. Qual é a principal característica das leituras Euphomor?",
+                options: ["Carga horária de muitos livros envolventes", "Apenas 1 página por ano", "Textos sem ilustração", "Conteúdo didático de física"],
+                correct: 0
+            }
+        ];
+
+        // Configuração Padrão do Certificado
+        const DEFAULT_CERT_CONFIG = {
+            title: "Certificado de Aprovação",
+            subtitle: "Euphomor 2026",
+            defaultName: "SKY MONTEIRO",
+            description: "Você foi aprovado como Euphomor de carteirinha no ano de 2026 com carga horária de muitos livros da sua cobrinha favorita. Nos vemos em 2027 para mais",
+            validation: "EDITORA EUPHORIA",
+            leftLabel: "Data de Emissão",
+            rightLabel: "Assinatura"
+        };
+
+        // Estado Global
+        let questions = [];
+        let certConfig = {};
+        let currentMode = 'editor'; // Inicializa direto no Modo Editor
+        let currentQuestionIndex = 0;
+        let userAnswers = {};
+
+        // Chaves do localStorage
+        const STORAGE_KEY_QUESTIONS = 'euphoria_quiz_questions_v2';
+        const STORAGE_KEY_CERT = 'euphoria_cert_config_v2';
+
+        window.onload = function() {
+            loadQuestions();
+            loadCertConfig();
+            updateDateDisplays();
+            renderNavActions();
+            populateCertEditorInputs();
+            renderEditor();
+            applyCertConfigToDOM();
+        };
+
+        // Carrega perguntas salvas ou padrão
+        function loadQuestions() {
+            const saved = localStorage.getItem(STORAGE_KEY_QUESTIONS);
+            if (saved) {
+                try {
+                    questions = JSON.parse(saved);
+                } catch(e) {
+                    questions = JSON.parse(JSON.stringify(DEFAULT_QUESTIONS));
+                }
+            } else {
+                questions = JSON.parse(JSON.stringify(DEFAULT_QUESTIONS));
+                saveQuestionsToStorage();
+            }
+        }
+
+        function saveQuestionsToStorage() {
+            localStorage.setItem(STORAGE_KEY_QUESTIONS, JSON.stringify(questions));
+        }
+
+        // Carrega configurações salvas do certificado ou padrão
+        function loadCertConfig() {
+            const saved = localStorage.getItem(STORAGE_KEY_CERT);
+            if (saved) {
+                try {
+                    certConfig = JSON.parse(saved);
+                } catch(e) {
+                    certConfig = { ...DEFAULT_CERT_CONFIG };
+                }
+            } else {
+                certConfig = { ...DEFAULT_CERT_CONFIG };
+                saveCertConfigToStorage();
+            }
+        }
+
+        function saveCertConfigToStorage() {
+            localStorage.setItem(STORAGE_KEY_CERT, JSON.stringify(certConfig));
+        }
+
+        // Atualiza a renderização dos elementos do Certificado (Modal e Final)
+        function applyCertConfigToDOM() {
+            if (!certConfig) return;
+
+            const title = certConfig.title || DEFAULT_CERT_CONFIG.title;
+            const subtitle = certConfig.subtitle || DEFAULT_CERT_CONFIG.subtitle;
+            const name = certConfig.defaultName || DEFAULT_CERT_CONFIG.defaultName;
+            const desc = certConfig.description || DEFAULT_CERT_CONFIG.description;
+            const val = certConfig.validation || DEFAULT_CERT_CONFIG.validation;
+            const leftLbl = certConfig.leftLabel || DEFAULT_CERT_CONFIG.leftLabel;
+            const rightLbl = certConfig.rightLabel || DEFAULT_CERT_CONFIG.rightLabel;
+
+            // Certificado Modal
+            document.getElementById('modal-cert-title').innerText = title;
+            document.getElementById('modal-cert-subtitle').innerText = subtitle;
+            document.getElementById('modal-cert-name').innerText = name.toUpperCase();
+            document.getElementById('modal-cert-desc').innerText = desc;
+            document.getElementById('modal-cert-validation').innerText = val;
+            document.getElementById('modal-cert-left-label').innerText = leftLbl;
+            document.getElementById('modal-cert-right-label').innerText = rightLbl;
+
+            // Certificado Final do Leitor
+            document.getElementById('final-cert-title').innerText = title;
+            document.getElementById('final-cert-subtitle').innerText = subtitle;
+            document.getElementById('final-cert-desc').innerText = desc;
+            document.getElementById('final-cert-validation').innerText = val;
+            document.getElementById('final-cert-left-label').innerText = leftLbl;
+            document.getElementById('final-cert-right-label').innerText = rightLbl;
+        }
+
+        function populateCertEditorInputs() {
+            document.getElementById('edit-cert-title').value = certConfig.title || '';
+            document.getElementById('edit-cert-subtitle').value = certConfig.subtitle || '';
+            document.getElementById('edit-cert-default-name').value = certConfig.defaultName || '';
+            document.getElementById('edit-cert-desc').value = certConfig.description || '';
+            document.getElementById('edit-cert-validation').value = certConfig.validation || '';
+            document.getElementById('edit-cert-left-label').value = certConfig.leftLabel || '';
+            document.getElementById('edit-cert-right-label').value = certConfig.rightLabel || '';
+        }
+
+        function updateCertConfigFromInputs() {
+            certConfig.title = document.getElementById('edit-cert-title').value;
+            certConfig.subtitle = document.getElementById('edit-cert-subtitle').value;
+            certConfig.defaultName = document.getElementById('edit-cert-default-name').value;
+            certConfig.description = document.getElementById('edit-cert-desc').value;
+            certConfig.validation = document.getElementById('edit-cert-validation').value;
+            certConfig.leftLabel = document.getElementById('edit-cert-left-label').value;
+            certConfig.rightLabel = document.getElementById('edit-cert-right-label').value;
+
+            saveCertConfigToStorage();
+            applyCertConfigToDOM();
+        }
+
+        function resetCertConfigDefaults() {
+            certConfig = { ...DEFAULT_CERT_CONFIG };
+            saveCertConfigToStorage();
+            populateCertEditorInputs();
+            applyCertConfigToDOM();
+            showCustomModal("Restaurado", "As configurações do certificado voltaram para os valores originais da Editora Euphoria.");
+        }
+
+        // Navegação Superior
+        function renderNavActions() {
+            const container = document.getElementById('nav-actions');
+            if (currentMode === 'quiz') {
+                container.innerHTML = `
+                    <button onclick="switchMode('editor')" class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-brandPink text-xs font-bold rounded-xl border border-brandPink/30 transition-all flex items-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-pen text-brandPink"></i> Painel de Edição
+                    </button>
+                `;
+            } else {
+                container.innerHTML = `
+                    <button onclick="switchMode('quiz')" class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-bold rounded-xl border border-zinc-700 transition-all flex items-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-eye"></i> Visualizar como Leitor
+                    </button>
+                `;
+            }
+        }
+
+        function switchMode(mode) {
+            currentMode = mode;
+            renderNavActions();
+            
+            const editorSec = document.getElementById('editor-mode');
+            const quizSec = document.getElementById('quiz-mode');
+
+            if (mode === 'editor') {
+                quizSec.classList.add('hidden');
+                editorSec.classList.remove('hidden');
+                populateCertEditorInputs();
+                renderEditor();
+            } else {
+                editorSec.classList.add('hidden');
+                quizSec.classList.remove('hidden');
+                restartQuiz();
+            }
+        }
+
+        /* ================= 1. LÓGICA DO EDITOR ================= */
+        function renderEditor() {
+            const container = document.getElementById('questions-editor-list');
+            container.innerHTML = '';
+
+            questions.forEach((q, qIndex) => {
+                const card = document.createElement('div');
+                card.className = "bg-black/60 border border-zinc-800 p-5 rounded-xl space-y-4";
+                
+                let optionsHTML = '';
+                q.options.forEach((opt, optIndex) => {
+                    const isChecked = q.correct === optIndex ? 'checked' : '';
+                    const optionLetter = String.fromCharCode(65 + optIndex);
+
+                    optionsHTML += `
+                        <div class="flex items-center gap-3">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="correct_${qIndex}" value="${optIndex}" ${isChecked} onchange="updateCorrectAnswer(${qIndex}, ${optIndex})" class="w-4 h-4 accent-pink-600">
+                                <span class="text-xs font-bold text-brandPink w-4">${optionLetter})</span>
+                            </label>
+                            <input type="text" value="${escapeHtml(opt)}" oninput="updateOptionText(${qIndex}, ${optIndex}, this.value)" placeholder="Opção ${optionLetter}" class="flex-1 bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brandPink">
+                        </div>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-brandPink uppercase tracking-wider">Questão ${qIndex + 1}</span>
+                        <span class="text-[10px] text-zinc-500">Marque o botão da alternativa correta</span>
+                    </div>
+
+                    <div>
+                        <input type="text" value="${escapeHtml(q.question)}" oninput="updateQuestionText(${qIndex}, this.value)" placeholder="Digite o enunciado da pergunta..." class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2.5 text-sm font-semibold text-white focus:outline-none focus:border-brandPink">
+                    </div>
+
+                    <div class="space-y-2 pt-1">
+                        ${optionsHTML}
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        function updateQuestionText(qIndex, text) {
+            questions[qIndex].question = text;
+            saveQuestionsToStorage();
+        }
+
+        function updateOptionText(qIndex, optIndex, text) {
+            questions[qIndex].options[optIndex] = text;
+            saveQuestionsToStorage();
+        }
+
+        function updateCorrectAnswer(qIndex, optIndex) {
+            questions[qIndex].correct = parseInt(optIndex, 10);
+            saveQuestionsToStorage();
+        }
+
+        function publishQuiz() {
+            saveQuestionsToStorage();
+            updateCertConfigFromInputs();
+            showCustomModal("Quiz Publicado!", "Perguntas e modelo do certificado foram salvos com sucesso.");
+            switchMode('quiz');
+        }
+
+        /* ================= 2. MODAL DE PRÉ-VISUALIZAÇÃO ================= */
+        function openPreviewModal() {
+            updateCertConfigFromInputs();
+            applyCertConfigToDOM();
+            document.getElementById('preview-modal').classList.remove('hidden');
+        }
+
+        function closePreviewModal() {
+            document.getElementById('preview-modal').classList.add('hidden');
+        }
+
+        /* ================= 3. LÓGICA DO QUIZ (LEITOR) ================= */
+        function renderQuizQuestion() {
+            const container = document.getElementById('quiz-question-container');
+            const progressText = document.getElementById('quiz-progress-text');
+            const btnPrev = document.getElementById('btn-prev');
+            const btnNext = document.getElementById('btn-next');
+
+            if (!questions || questions.length === 0) return;
+
+            const q = questions[currentQuestionIndex];
+            progressText.innerText = `Pergunta ${currentQuestionIndex + 1} de ${questions.length}`;
+
+            btnPrev.disabled = currentQuestionIndex === 0;
+            if (currentQuestionIndex === questions.length - 1) {
+                btnNext.innerHTML = 'Finalizar Quiz <i class="fa-solid fa-check ml-2"></i>';
+            } else {
+                btnNext.innerHTML = 'Próxima <i class="fa-solid fa-arrow-right ml-2"></i>';
+            }
+
+            let optionsHTML = '';
+            q.options.forEach((opt, optIndex) => {
+                const isSelected = userAnswers[currentQuestionIndex] === optIndex;
+                const optionLetter = String.fromCharCode(65 + optIndex);
+                
+                optionsHTML += `
+                    <label onclick="selectAnswer(${currentQuestionIndex}, ${optIndex})" class="flex items-center gap-4 p-4 rounded-xl border transition-all cursor-pointer ${isSelected ? 'bg-pink-950/40 border-brandPink text-white shadow-md shadow-pink-950/20' : 'bg-black/50 border-zinc-800 hover:border-zinc-700 text-zinc-300'}">
+                        <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold border ${isSelected ? 'bg-brandPink text-white border-brandPink' : 'bg-zinc-800 text-zinc-400 border-zinc-700'}">
+                            ${optionLetter}
+                        </div>
+                        <span class="text-sm font-medium leading-relaxed">${escapeHtml(opt)}</span>
+                    </label>
+                `;
+            });
+
+            container.innerHTML = `
+                <h3 class="text-xl font-bold text-white leading-snug">${escapeHtml(q.question)}</h3>
+                <div class="space-y-3 pt-2">
+                    ${optionsHTML}
+                </div>
+            `;
+        }
+
+        function selectAnswer(qIndex, optIndex) {
+            userAnswers[qIndex] = optIndex;
+            renderQuizQuestion();
+        }
+
+        function nextQuestion() {
+            if (userAnswers[currentQuestionIndex] === undefined) {
+                showCustomModal("Atenção", "Por favor, selecione uma opção antes de avançar.");
+                return;
+            }
+
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                renderQuizQuestion();
+            } else {
+                calculateResults();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuizQuestion();
+            }
+        }
+
+        function calculateResults() {
+            let score = 0;
+            questions.forEach((q, index) => {
+                if (userAnswers[index] === q.correct) {
+                    score++;
+                }
+            });
+
+            document.getElementById('quiz-card').classList.add('hidden');
+            const resultsCard = document.getElementById('results-card');
+            resultsCard.classList.remove('hidden');
+
+            const scoreText = document.getElementById('score-text');
+            scoreText.innerText = `Você acertou ${score} de ${questions.length} perguntas! Seu certificado oficial de aprovação está pronto abaixo.`;
+
+            // Nome padrão inicial no certificado final
+            const defaultName = certConfig.defaultName || "SKY MONTEIRO";
+            document.getElementById('cert-name-input').value = defaultName;
+            document.getElementById('final-cert-name').innerText = defaultName.toUpperCase();
+            
+            applyCertConfigToDOM();
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            userAnswers = {};
+            document.getElementById('results-card').classList.add('hidden');
+            document.getElementById('quiz-card').classList.remove('hidden');
+            renderQuizQuestion();
+        }
+
+        /* ================= 4. GERAÇÃO E DOWNLOAD EM PNG ================= */
+        function updateDateDisplays() {
+            const dateStr = new Date().toLocaleDateString('pt-BR');
+            document.getElementById('modal-cert-date').innerText = dateStr;
+            document.getElementById('final-cert-date').innerText = dateStr;
+        }
+
+        function updateCertName(val) {
+            const trimmed = val.trim();
+            const displayName = trimmed.length > 0 ? trimmed.toUpperCase() : "SKY MONTEIRO";
+            document.getElementById('final-cert-name').innerText = displayName;
+        }
+
+        function downloadPNG(elementId) {
+            const targetElement = document.getElementById(elementId);
+            const name = (certConfig.defaultName || "Euphomor").replace(/\s+/g, '_');
+
+            html2canvas(targetElement, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: "#ffffff"
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `Certificado_Euphomor_${name}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }).catch(err => {
+                console.error("Erro ao gerar PNG:", err);
+                showCustomModal("Erro", "Não foi possível gerar a imagem PNG do certificado.");
+            });
+        }
+
+        /* ================= UTILITÁRIOS ================= */
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function showCustomModal(title, message) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = message;
+            document.getElementById('custom-modal-container').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('custom-modal-container').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
